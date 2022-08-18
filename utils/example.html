@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <script src="https://cdn.paymeservice.com/hf/v1/hostedfields.js"></script>
+      <meta charset="utf-8" />
+      <style>
+        input.credit-card .base {
+          background-color: #000000;
+          font-size: 16px;
+          text-align: center;
+          letter-spacing: 0.25em;
+          text-decoration: underline;
+          text-shadow: 1px 1px 2px black, 0 0 1em red;
+          text-transform: uppercase;
+        }
+      </style>
+    </head>
+    <body>
+      <!-- PAYMENT FORM STARTS HERE -->
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12 col-md-4">
+            <div class="panel panel-default credit-card-box">
+              <div class="panel-body">
+                <form role="form" id="checkout-form">
+                  <div class="row">
+                    <div class="col-xs-12 col-md-12">
+                      <div class="form-group" id="card-number-group">
+                        <label for="card-number-container" class="control-label"
+                          >CARD NUMBER</label
+                        >
+  
+                        <!-- Container for Credit Card number field -->
+                        <div
+                          id="card-number-container"
+                          class="form-control input-lg"></div>
+                      </div>
+                    </div>
+                  </div>
+  
+                  <div class="row">
+                    <div class="col-xs-7 col-md-7">
+                      <div class="form-group" id="card-expiration-group">
+                        <label
+                          for="card-expiration-container"
+                          class="control-label"
+                          >EXPIRATION DATE</label
+                        >
+  
+                        <!-- Container for Credit Card expiration date field -->
+                        <div
+                          id="card-expiration-container"
+                          class="form-control input-lg"></div>
+                      </div>
+                    </div>
+                    <div class="col-xs-5 col-md-5 pull-right">
+                      <div class="form-group" id="card-cvv-group">
+                        <label for="card-cvv-container" class="control-label"
+                          >CVV</label
+                        >
+  
+                        <!-- Container for Credit Card CVV field -->
+                        <div
+                          id="card-cvv-container"
+                          class="form-control input-lg"></div>
+                      </div>
+                    </div>
+                  </div>
+  
+                  <div class="row">
+                    <div class="col-xs-12">
+                      <!-- Form submit button -->
+                      <button
+                        class="subscribe btn btn-success btn-lg btn-block"
+                        id="submit-button">
+                        Pay 55.00 USD
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script>
+        const form = document.querySelector('#checkout-form');
+        const submitButton = document.querySelector('#submit-button');
+        const apiKey = '93aa63ff-b12b-47fe-ad50-fabf920d5aa5'; // Merchant API key from Settings page in the dashboard
+  
+        PayMe.create(apiKey, {testMode: true})
+          .then(function (instance) {
+            var fields = instance.hostedFields();
+            // window.parent.postMessage(JSON.stringify(instance), '*');
+  
+            var cardNumberFieldOptions = {
+              placeholder: 'Enter your Credit Card Number',
+              messages: {
+                required: 'The Credit Card Number is Required!',
+                invalid: 'Bad Credit Card Number',
+              },
+              styles: {
+                base: {
+                  color: 'red',
+                  '::placeholder': {
+                    color: '#F2F2F2',
+                  },
+                },
+                invalid: {
+                  color: 'red',
+                },
+                valid: {
+                  color: 'green',
+                },
+              },
+            };
+  
+            var cardNumber = fields.create(
+              PayMe.fields.NUMBER,
+              cardNumberFieldOptions,
+            );
+            var expiration = fields.create(PayMe.fields.EXPIRATION);
+            var cvc = fields.create(PayMe.fields.CVC);
+  
+            cardNumber.on('keyup', function (event) {
+              console.log(event);
+            });
+  
+            // Mount credit card inside container with id="card-number-container"
+  
+            const submitForm = async () => {
+              console.log('entered submit function');
+              // window.parent.postMessage('entered submit function', '*');
+            //   window.ReactNativeWebView.postMessage('entered submit function');
+              var saleData = {
+                payerFirstName: 'Foo',
+                payerLastName: 'Bar',
+                payerEmail: 'foo-bar@domain.com',
+                payerPhone: '1231231',
+                payerSocialId: '12345',
+                payerZipCode: '123456',
+  
+                total: {
+                  label: 'Order #123123',
+                  amount: {
+                    currency: 'USD',
+                    value: '55.00',
+                  },
+                },
+              };
+  
+              // Call for tokenization
+              console.log('before tokenization');
+              // window.parent.postMessage('before tokenization', '*');
+            //   window.ReactNativeWebView.postMessage('before tokenization');
+  
+              const res = await instance.tokenize(saleData);
+  
+              console.log(JSON.stringify(res));
+              // window.parent.postMessage(JSON.stringify({tokenized: res}), '*');
+            //   window.ReactNativeWebView.postMessage(JSON.stringify({tokenized: res}));
+  
+              //   window.ReactNativeWebView.postMessage(JSON.stringify(res));
+              console.log('after tokenization');
+              // window.parent.postMessage('after tokenization', '*');
+            //   window.ReactNativeWebView.postMessage('after tokenization');
+            };
+  
+            submitButton.addEventListener('click', e => {
+              e.preventDefault();
+              submitForm();
+            });
+  
+            cardNumber.mount('#card-number-container');
+            expiration.mount('#card-expiration-container');
+            cvc.mount('#card-cvv-container');
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      </script>
+    </body>
+  </html>
